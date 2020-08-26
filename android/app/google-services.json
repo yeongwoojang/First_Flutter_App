@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "513194899249",
+    "firebase_url": "https://footballmatch-f02b7.firebaseio.com",
+    "project_id": "footballmatch-f02b7",
+    "storage_bucket": "footballmatch-f02b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:513194899249:android:0b9439cf99d65622d7a210",
+        "android_client_info": {
+          "package_name": "com.example.football_match"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "513194899249-2peiv2d3ko4pjc7pfrnmc0vrfd34r32s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.football_match",
+            "certificate_hash": "9f03963a283f6c70c16e715ed013cc85b5bf3403"
+          }
+        },
+        {
+          "client_id": "513194899249-qgb8vp4im628vcgbhhcak09640c8kgk6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdnP6x7kZHD1GWDk65hbgSjuSpJzWJTb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "513194899249-qgb8vp4im628vcgbhhcak09640c8kgk6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
