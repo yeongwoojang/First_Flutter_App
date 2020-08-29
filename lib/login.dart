@@ -15,75 +15,63 @@ class _LogInPageState extends State<LogInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-        backgroundColor: Colors.amber,
+      appBar: AppBar(
+        backgroundColor: Colors.greenAccent,
         title: Text(
-        'LogIn',
-        style: TextStyle(
-        color: Colors.white,
-    ),
-    ),
-    centerTitle: true,
-    elevation: 0.2,
-    ),
-      body : Padding(
-      padding: EdgeInsets.all(20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          RaisedButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Image.asset('image/glogo.png'),
-                Text(
-                  '구글로그인',
-                  style: TextStyle(fontSize: 15, color: Colors.black87),
-                ),
-                Opacity(
-                  opacity: 0.0,
-                  child: Image.asset('image/glogo.png'),
-                ),
-              ],
-            ),
+          'LogIn',
+          style: TextStyle(
             color: Colors.white,
-            onPressed: () async {
-              final User user = await _auth.currentUser;
-              if (user == null) {
-                _signInWithGoogle(context);
-              } else {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    duration: Duration(seconds: 1),
-                    content: Text('이미 로그인되어있습니다.'),
-                  ),
-                );
-              }
-            },
           ),
-          RaisedButton(
-            child: Text(
-              '로그아웃',
-              style: TextStyle(fontSize: 15, color: Colors.black87),
-            ),
-            onPressed: () async {
-              final User user = await _auth.currentUser;
-              if (user == null) {
-                Scaffold.of(context).showSnackBar(const SnackBar(
-                  content: Text('로그인 하지 않았습니다.'),
-                ));
-                return;
-              }
-              _signOut();
-              final String uid = user.displayName;
-              // Scaffold.of(context).showSnackBar(SnackBar(
-                // content: Text(uid + '이(가) 로그아웃 되었습니다.'),
-              // ));
-            },
-          ),
-        ],
+        ),
+        centerTitle: true,
+        elevation: 0.2,
       ),
-    ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    side : BorderSide(color: Colors.white)
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Image.asset('image/glogo.png'),
+                      Text(
+                        '구글로그인',
+                        style: TextStyle(fontSize: 15, color: Colors.black87),
+                      ),
+                      Opacity(
+                        opacity: 0.0,
+                        child: Image.asset('image/glogo.png'),
+                      ),
+                    ],
+                  ),
+                  color: Colors.white,
+                  onPressed: () async {
+                    final User user = await _auth.currentUser;
+                    if (user == null) {
+                      _signInWithGoogle(context);
+                    } else {
+                      Scaffold.of(context).showSnackBar(
+                        SnackBar(
+                          duration: Duration(seconds: 1),
+                          content: Text('이미 로그인되어있습니다.'),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

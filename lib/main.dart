@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         '/user': (BuildContext context) => UserPage(),
       },
       theme: ThemeData(
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.blue,
       ),
     );
   }
