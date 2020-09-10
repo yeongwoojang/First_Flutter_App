@@ -1,39 +1,25 @@
-import 'package:flutter/material.dart';
-import 'package:football_match/auth.dart';
-import 'package:football_match/login.dart';
+import "package:flutter/material.dart";
+import 'package:football_match/root_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:football_match/user_page.dart';
 
-void main() async {
+Future main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final Auth _auth = Auth();
-  final bool isLogged = await _auth.isLogged();
-  runApp(MyApp(
-      initialRoute : isLogged ? '/user' : '/'
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
-  final String initialRoute;
-
-
-  MyApp({this.initialRoute});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Football_Match',
-      initialRoute: initialRoute,
-      routes: {
-        '/': (BuildContext context) => LogInPage(),
-        '/user': (BuildContext context) => UserPage(),
-      },
+      title: 'Flutter Demo',
       theme: ThemeData(
+        primaryColor: Colors.white,
+        accentColor: Colors.black,
         primarySwatch: Colors.blue,
-      ),
+    ),
+      home : RootPage(),
     );
   }
 }
