@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:football_match/first_create_page.dart';
+import 'package:football_match/function_page.dart';
 import 'package:football_match/home_page.dart';
 import 'package:football_match/search_page.dart';
-import 'package:football_match/seconed_create_page.dart';
+import 'package:football_match/second_create_page.dart';
 
 class TabPage extends StatefulWidget {
   final User user;
@@ -24,7 +25,8 @@ class _TabPageState extends State<TabPage> {
     _pages = [
       HomePage(widget.user),
       SearchPage(widget.user),
-      SeconedCreatePage(widget.user),
+      FirstCreatePage(),
+      FunctionPage(),
     ];
   }
 
@@ -52,6 +54,10 @@ class _TabPageState extends State<TabPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.create),
               title: Text('Create'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.functions),
+              title: Text('Function'),
             ),
           ]),
     );

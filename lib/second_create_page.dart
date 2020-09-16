@@ -1,22 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:football_match/firebase_provider.dart';
+import 'package:provider/provider.dart';
 
-class SeconedCreatePage extends StatefulWidget {
-  final User user;
+class SecondCreatePage extends StatefulWidget {
+  final String location;
 
-  SeconedCreatePage(this.user);
+  SecondCreatePage(this.location);
 
   @override
-  _SeconedCreatePageState createState() => _SeconedCreatePageState();
+  _SecondCreatePageState createState() => _SecondCreatePageState();
 }
 
-class _SeconedCreatePageState extends State<SeconedCreatePage> {
+class _SecondCreatePageState extends State<SecondCreatePage> {
+
+  FirebaseFirestore _db = FirebaseFirestore.instance;
+  FirebaseProvider fp;
   TextEditingController title = TextEditingController();
   TextEditingController content = TextEditingController();
 
+
+
   @override
   Widget build(BuildContext context) {
+    fp = Provider.of<FirebaseProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title : Text('Football Match')
@@ -56,31 +64,8 @@ class _SeconedCreatePageState extends State<SeconedCreatePage> {
                   color: Colors.grey,
                   child: Text('등록'),
                   onPressed: () {
-                    FirebaseFirestore.instance
-                        .collection('user')
-                        .doc(widget.user.displayName)
-                        .get()
-                        .then((snapshot) {
-                      if (snapshot.data() == null) {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('먼저 지역을 설정해주세요.'),
-                            duration: Duration(seconds: 1),
-                          ),
-                        );
-                      } else {
-                        FirebaseFirestore.instance
-                            .collection('user')
-                            .doc(widget.user.displayName)
-                            .update({
-                          'title': FieldValue.arrayUnion([title.text]),
-                          'content': FieldValue.arrayUnion([content.text]),
-                        });
-                        title.clear();
-                        content.clear();
-                        FocusScope.of(context).unfocus();
-                      }
-                    });
+                    write();
+                    Navigator.pop(context);
                   },
                 ),
               ),
@@ -89,5 +74,32 @@ class _SeconedCreatePageState extends State<SeconedCreatePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    title.dispose();
+    content.dispose();
+  }
+  void write() async{
+    var now = new DateTime.now();
+    var matches = _db.collection('matches').doc(now.toString());
+    var users = _db.collection('users').doc(fp.getUser().uid);
+    await matches.set({
+      'creator' :fp.getUser().displayName,
+      'location' : widget.location,
+      'title' : title.text,
+      'content': content.text
+    });
+
+    await users.collection('myMatch').doc(now.toString())
+    .set({
+      'title' : title.text,
+      'content' : content.text,
+      'location' : widget.location,
+      'matchingState' : false
+    });
   }
 }
