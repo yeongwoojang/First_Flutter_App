@@ -26,7 +26,6 @@ class _TabPageState extends State<TabPage> {
       HomePage(widget.user),
       SearchPage(widget.user),
       FirstCreatePage(),
-      FunctionPage(),
     ];
   }
 
@@ -54,10 +53,6 @@ class _TabPageState extends State<TabPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.create),
               title: Text('Create'),
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.functions),
-              title: Text('Function'),
             ),
           ]),
     );

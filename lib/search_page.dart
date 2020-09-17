@@ -42,7 +42,9 @@ class _SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Match'),
+        title: Text('MatchList'),
+        centerTitle: true,
+        backgroundColor: Colors.green[100],
         actions: <Widget>[
           DropdownButton<String>(
             value: dropDownValue,
@@ -82,7 +84,7 @@ class _SearchPageState extends State<SearchPage> {
         if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
         } else {
-          var items = snapshot.data.documents;
+          var items = snapshot.data.docs;
           return ListView.builder(
               itemCount: items.length,
               itemBuilder: (context, index) {
