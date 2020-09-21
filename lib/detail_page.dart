@@ -22,6 +22,8 @@ class _DetailPageState extends State<DetailPage> {
   final FirebaseMessaging _fcm = FirebaseMessaging();
   FirebaseProvider fp;
 
+  var currentUser;
+  
   final String fName = "name";
   final String fToken = "token";
   final String fCreateTime = "createTime";
@@ -41,6 +43,7 @@ class _DetailPageState extends State<DetailPage> {
         //앱이 실행중일 경우
         onMessage: (Map<String, dynamic> message) async {
       print('onMessage : $message');
+      print(message.values);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -58,6 +61,12 @@ class _DetailPageState extends State<DetailPage> {
           ],
         ),
       );
+      var uid = message['data']['uid'];
+      print(uid);
+      var user = _db.collection('users').doc(currentUser);
+      user.update({
+        'requestor' : FieldValue.arrayUnion([uid])
+      });
     },
         //앱이 완전히 종료된 경우
         onLaunch: (Map<String, dynamic> message) async {
@@ -76,6 +85,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget _buildBody() {
     fp = Provider.of<FirebaseProvider>(context);
+    currentUser = fp.getUser().uid;
     return Center(
       child: SizedBox(
         width: 400.0,
@@ -179,7 +189,8 @@ class _DetailPageState extends State<DetailPage> {
       <String, dynamic>{
         fToken: token,
         "title": "Football Matching",
-        "body": '${fp.getUser().displayName}님으로부터 매칭요청이 도착했습니다.'
+        "body": '${fp.getUser().displayName}님으로부터 매칭요청이 도착했습니다.',
+        "uid" : "${fp.getUser().uid}"
       },
     );
   }

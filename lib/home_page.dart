@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
+  var currentUser;
 
   HomePage(this.user);
 
@@ -21,6 +22,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   String location = '';
   String test = '';
   FirebaseProvider fp;
@@ -103,30 +106,114 @@ class _HomePageState extends State<HomePage> {
     fp = Provider.of<FirebaseProvider>(context);
     if (didUpdateUserInfo == false) updateUserInfo();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Football Match'),
         backgroundColor: Colors.green[100],
-        leading: IconButton(
-          icon: Icon(Icons.menu),
+        leading: GestureDetector(
+          onTap: () {
+            _scaffoldKey.currentState.openDrawer();
+          },
+          child: Icon(Icons.menu),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () {
-              fp.signOut();
-//            fp.withdrawalAccount();
-            },
-          ),
-        ],
       ),
       body: _buildBody(context),
-      drawer: Drawer(),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Menu',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20.0),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 15.0),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text('등급 : ',
+                          style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold)),
+                      Padding(padding: EdgeInsets.only(right: 10.0)),
+                      Text(''),
+                    ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 15.0),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Text('경고 : ',
+                          style: TextStyle(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold)),
+                      Padding(padding: EdgeInsets.only(right: 10.0)),
+                      Text(''),
+                    ],
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Colors.green[100],
+              ),
+            ),
+            StreamBuilder(
+                stream:
+                    _db.collection("users").doc(fp.getUser().uid).snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  var mSelected = false;
+                  if (!snapshot.hasData) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.data.data() == null) {
+                    return Center(child: CircularProgressIndicator());
+                  } else {
+                    var items = snapshot.data;
+                    if (items.data()['requestor'] != null) {
+                      mSelected = true;
+                    }
+                    return ListTile(
+                      title: Text('요청보기'),
+                      trailing: IconButton(
+                          icon: Icon(Icons.check),
+                          color: Colors.black,
+                          onPressed: () {
+                            getRequestorList(context);
+                          }),
+                      selected: mSelected,
+                    );
+                  }
+                }),
+            ListTile(
+              title: Text('로그아웃'),
+              trailing: IconButton(
+                icon: Icon(Icons.exit_to_app),
+                color: Colors.black,
+                onPressed: () {
+                  fp.signOut();
+//            fp.withdrawalAccount();
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildBody(BuildContext context) {
     fp = Provider.of<FirebaseProvider>(context);
-
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: SafeArea(
@@ -376,5 +463,60 @@ class _HomePageState extends State<HomePage> {
   void setLocation(String location) async {
     var user = _db.collection("users").doc(fp.getUser().uid);
     await user.update({fLocation: location});
+  }
+
+  void getRequestorList(context) async {
+    var list;
+    var user = _db.collection("users").doc(fp.getUser().uid);
+    await user.get().then((DocumentSnapshot doc) {
+      if(doc.data()['requestor']==null){
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+          content: Text('요청이 없습니다.'),
+          duration: Duration(seconds: 1),
+        ));
+        return false;
+      }else{
+        List<String> test = List.from(doc.data()['requestor']);
+        if (test.length!=0) {
+          _db.collection('users').get().then((QuerySnapshot snapshot){
+            list = snapshot.docs;
+            for(int i=0;i<list.length;i++){
+              if(test.contains(list[i].id)){
+                print(list[i].data()['name']);
+              }
+            }
+            showDialog( context: context,
+                builder: (context){
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    content: SingleChildScrollView(
+                        child: SafeArea(
+                            child: SizedBox(
+                              width: 500,
+                              height: 500,
+                              child: Container(
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: list.length,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return ListTile(
+                                          title : Text(list[index].data()['name'])
+                                      );
+                                    }),
+                              ),
+                            ))),
+                  );
+                });
+
+          });
+
+      }
+
+
+      }
+    });
+
   }
 }

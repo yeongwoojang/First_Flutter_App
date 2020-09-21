@@ -15,7 +15,6 @@ class SecondCreatePage extends StatefulWidget {
 }
 
 class _SecondCreatePageState extends State<SecondCreatePage> {
-
   FirebaseFirestore _db = FirebaseFirestore.instance;
   FirebaseProvider fp;
   TextEditingController title = TextEditingController();
@@ -23,6 +22,7 @@ class _SecondCreatePageState extends State<SecondCreatePage> {
 
   String _selectedDate;
   DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+
   @override
   Widget build(BuildContext context) {
     fp = Provider.of<FirebaseProvider>(context);
@@ -38,109 +38,123 @@ class _SecondCreatePageState extends State<SecondCreatePage> {
   }
 
   Widget _buildBody() {
-    return SingleChildScrollView(
-      child: SafeArea(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              Container(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      ButtonTheme(
-                        minWidth: 50.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        child: RaisedButton(
-                          color: Colors.white,
-                          child: Text('취소'),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          elevation: 0.8,
-                        ),
+    return Builder(
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: SafeArea(
+            child: Center(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          ButtonTheme(
+                            minWidth: 50.0,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0)),
+                            child: RaisedButton(
+                              color: Colors.white,
+                              child: Text('취소'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              elevation: 0.8,
+                            ),
+                          ),
+                          Text('글쓰기',
+                              style: TextStyle(
+                                  fontSize: 20.0, fontWeight: FontWeight.bold)),
+                          ButtonTheme(
+                            minWidth: 50.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: RaisedButton(
+                              color: Colors.white,
+                              child: Text('등록'),
+                              elevation: 0.8,
+                              onPressed: () {
+                                print(_selectedDate);
+                                if (_selectedDate == null ||title.text==null || content.text ==null) {
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text('정확히 입력해주세요'
+                                        ''),
+                                    duration: Duration(seconds: 1),
+                                  ));
+                                } else {
+                                  write();
+                                  Navigator.pop(context);
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      Text('글쓰기',
-                          style: TextStyle(
-                              fontSize: 20.0, fontWeight: FontWeight.bold)),
-                      ButtonTheme(
-                        minWidth: 50.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: RaisedButton(
-                          color: Colors.white,
-                          child: Text('등록'),
-                          elevation: 0.8,
-                          onPressed: () {
-                            write();
-                            Navigator.pop(context);
-                          },
-                        ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Text('날짜 : '),
+                      Text(_selectedDate ?? ''),
+                      IconButton(
+                        icon: Icon(Icons.date_range),
+                        onPressed: () {
+                          Future<DateTime> date = showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate:
+                                  DateTime.now().add(Duration(days: 1000)),
+                              builder:
+                                  (BuildContext buildContext, Widget child) {
+                                return Theme(
+                                  data: ThemeData.dark(),
+                                  child: child,
+                                );
+                              });
+                          date.then((dateTime) {
+                            setState(() {
+                              _selectedDate = dateFormat.format(dateTime);
+                            });
+                          });
+                        },
                       ),
                     ],
                   ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Text('날짜 : '),
-                  Text(_selectedDate??''),
-                  IconButton(
-                    icon: Icon(Icons.date_range),
-                    onPressed: (){
-                      Future<DateTime> date = showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(Duration(days: 1000)),
-                          builder: (BuildContext buildContext, Widget child){
-                            return Theme(
-                              data : ThemeData.dark(),
-                              child: child,
-                            );
-                          }
-                      );
-                      date.then((dateTime){
-                        setState(() {
-                          _selectedDate = dateFormat.format(dateTime);
-                        });
-                      });
-                    },
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                  ),
+                  TextField(
+                    controller: title,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(5.0),
+                      hintText: "제목",
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)),
+                    ),
+                    scrollPadding: EdgeInsets.all(10.0),
+                  ),
+                  TextField(
+                    controller: content,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(5.0),
+                      hintText: "내용",
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)),
+                    ),
+                    scrollPadding: EdgeInsets.all(10.0),
+                    maxLines: 10,
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.all(8.0),
-              ),
-              TextField(
-                controller: title,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  hintText: "제목",
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                ),
-                scrollPadding: EdgeInsets.all(10.0),
-              ),
-              TextField(
-                controller: content,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(5.0),
-                  hintText: "내용",
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white)),
-                ),
-                scrollPadding: EdgeInsets.all(10.0),
-                maxLines: 10,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -161,14 +175,14 @@ class _SecondCreatePageState extends State<SecondCreatePage> {
       'location': widget.location,
       'title': title.text,
       'content': content.text,
-      'date' : _selectedDate
+      'date': _selectedDate
     });
 
     await users.collection('myMatch').doc(now.toString()).set({
       'title': title.text,
       'content': content.text,
       'location': widget.location,
-      'date' : _selectedDate,
+      'date': _selectedDate,
       'matchingState': false
     });
   }
